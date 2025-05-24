@@ -1,3 +1,14 @@
+function getChartDimensions() {
+    const width = window.innerWidth;
+    return {
+        mapWidth: Math.min(width * 0.5, 700),
+        mapHeight: Math.min(width * 0.3, 400),
+        chartWidth: Math.min(width * 0.4, 380),
+        chartHeight: Math.min(width * 0.5, 300),
+        chartFontSize: Math.min(width * 0.025, 12),
+    };
+}
+
 export function renderMap(data, onInsightCallback) {
     const stateToFIPS = {
       'Alabama': '01', 'Alaska': '02', 'Arizona': '04', 'Arkansas': '05',
@@ -40,75 +51,78 @@ export function renderMap(data, onInsightCallback) {
     mapData.forEach(d => {
       d.id = stateToFIPS[d.state];
     });
-    console.log("mapData", mapData);
-    const mapSpec = {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "title": "US Profitability Data",
-        "width": 700,
-        "height": 400,
-        "projection": {"type": "albersUsa"},
-        "layer": [
-            {
-              "data": {
-                "url": "data/us-10m.json",
-                "format": {
-                  "type": "topojson",
-                  "feature": "states"
-                }
-              },
-              "transform": [
+
+    function updateMapSpec() {
+        const dims = getChartDimensions();
+        const mapSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "title": "US Profitability Data",
+            "width": dims.mapWidth,
+            "height": dims.mapHeight,
+            "projection": {"type": "albersUsa"},
+            "layer": [
                 {
-                    "lookup": "id",
-                    "from": {
-                        "data": { "values": mapData },
-                        "key": "id",
-                        "fields": ["state", "sales", "profit", "profitRatio", "region"]
+                  "data": {
+                    "url": "data/us-10m.json",
+                    "format": {
+                      "type": "topojson",
+                      "feature": "states"
                     }
-                }
-              ],
-              "mark": {
-                "type": "geoshape",
-                "stroke": "#0ff",
-                "strokeWidth": 0.5
-              },
-              "encoding": {
-                "color": {
-                  "field": "profitRatio",
-                  "type": "quantitative",
-                  "scale": {
-                    "domain": [-50, 0, 50],
-                    "range": ["#ff6b6b", "#ffffff", "#45b7d1"]
                   },
-                  "title": "Profit Ratio (%)"
-                },
-                "tooltip": [
-                  { "field": "state", "type": "nominal", "title": "State" },
-                  { "field": "region", "type": "nominal", "title": "Region" },
-                  { "field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f" },
-                  { "field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f" },
-                  { "field": "profitRatio", "type": "quantitative", "title": "Profit Percent", "format": ".1f" }
-                ]
-              }
-            }
-
-        ]
-    };
-
-    vegaEmbed('#map-chart', mapSpec, {actions: false}).then(result => {
-        result.view.addEventListener('click', (event, item) => {
-            if (item && item.datum) {
-                const insightData = {
-                    state: item.datum.properties.name,
-                    region: item.datum.region,
-                    sales: item.datum.sales,
-                    profit: item.datum.profit,
-                    profitRatio: item.datum.profitRatio
-                };
-                console.log(insightData);
-                onInsightCallback('location', insightData);
-            }
+                  "transform": [
+                    {
+                        "lookup": "id",
+                        "from": {
+                            "data": { "values": mapData },
+                            "key": "id",
+                            "fields": ["state", "sales", "profit", "profitRatio", "region"]
+                        }
+                    }
+                  ],
+                  "mark": {
+                    "type": "geoshape",
+                    "stroke": "#0ff",
+                    "strokeWidth": 0.5
+                  },
+                  "encoding": {
+                    "color": {
+                      "field": "profitRatio",
+                      "type": "quantitative",
+                      "scale": {
+                        "domain": [-50, 0, 50],
+                        "range": ["#ff6b6b", "#ffffff", "#45b7d1"]
+                      },
+                      "title": "Profit Ratio (%)"
+                    },
+                    "tooltip": [
+                      { "field": "state", "type": "nominal", "title": "State" },
+                      { "field": "region", "type": "nominal", "title": "Region" },
+                      { "field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f" },
+                      { "field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f" },
+                      { "field": "profitRatio", "type": "quantitative", "title": "Profit Percentage", "format": ".1f" }
+                    ]
+                  }
+                }
+            ]
+        };
+        vegaEmbed('#map-chart', mapSpec, {actions: false}).then(result => {
+            result.view.addEventListener('click', (event, item) => {
+                if (item && item.datum) {
+                    const insightData = {
+                        state: item.datum.properties.name,
+                        region: item.datum.region,
+                        sales: item.datum.sales,
+                        profit: item.datum.profit,
+                        profitRatio: item.datum.profitRatio
+                    };
+                    onInsightCallback('location', insightData);
+                }
+            });
         });
-    });
+    }
+
+    updateMapSpec();
+    window.addEventListener('resize', updateMapSpec);
 }
 
 function aggregateByMonth(data, groupBy) {
@@ -137,117 +151,127 @@ function aggregateByMonth(data, groupBy) {
 export function renderSegmentChart(data, onInsightCallback) {
     const monthlyData = aggregateByMonth(data, 'segment');
 
-    const segmentSpec = {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "data": {"values": monthlyData},
-        "facet": {
-            "row": {
-                "field": "segment",
-                "type": "nominal",
-                "title": null,
-                "header": {"labelFontSize": 14}
-            }
-        },
-        "spec": {
-            "width": 380,
-            "height": 100,
-            "mark": {"type": "line", "point": true},
-            "encoding": {
-                "x": {
-                    "field": "date",
-                    "type": "temporal",
-                    "title": "Date",
-                    "axis": {"format": "%b %Y"}
-                },
-                "y": {
-                    "field": "sales",
-                    "type": "quantitative",
-                    "title": "Sales ($)",
-                    "axis": {"format": "$,.0f"}
-                },
-                "color": {
+    function updateSegmentSpec() {
+        const dims = getChartDimensions();
+        const segmentSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "data": {"values": monthlyData},
+            "facet": {
+                "row": {
                     "field": "segment",
                     "type": "nominal",
-                    "scale": {
-                        "domain": ["Consumer", "Corporate", "Home Office"],
-                        "range": ["#4e79a7", "#f28e2c", "#e15759"]
+                    "title": null,
+                    "header": {"labelFontSize": dims.chartFontSize, "labelAngle": 0, "labelAlign": "left"}
+                }
+            },
+            "spec": {
+                "width": dims.chartWidth,
+                "height": dims.chartHeight / 3,  // Divide by 3 for each segment
+                "mark": {"type": "line", "point": true},
+                "encoding": {
+                    "x": {
+                        "field": "date",
+                        "type": "temporal",
+                        "title": "Date",
+                        "axis": {"format": "%b %Y"}
                     },
-                    "legend": null
-                },
-                "tooltip": [
-                    {"field": "date", "type": "temporal", "title": "Date"},
-                    {"field": "segment", "type": "nominal", "title": "Segment"},
-                    {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"},
-                    {"field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f"}
-                ]
+                    "y": {
+                        "field": "sales",
+                        "type": "quantitative",
+                        "title": "Sales ($)",
+                        "axis": {"format": "$,.0f"}
+                    },
+                    "color": {
+                        "field": "segment",
+                        "type": "nominal",
+                        "scale": {
+                            "domain": ["Consumer", "Corporate", "Home Office"],
+                            "range": ["#4e79a7", "#f28e2c", "#e15759"]
+                        },
+                        "legend": null
+                    },
+                    "tooltip": [
+                        {"field": "date", "type": "temporal", "title": "Date"},
+                        {"field": "segment", "type": "nominal", "title": "Segment"},
+                        {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"},
+                        {"field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f"}
+                    ]
+                }
             }
-        }
-    };
-
-    vegaEmbed('#segment-chart', segmentSpec, {actions: false}).then(result => {
-        result.view.addEventListener('click', (event, item) => {
-            if (item && item.datum) {
-                onInsightCallback('segment', item.datum);
-            }
+        };
+        vegaEmbed('#segment-chart', segmentSpec, {actions: false}).then(result => {
+            result.view.addEventListener('click', (event, item) => {
+                if (item && item.datum) {
+                    onInsightCallback('segment', item.datum);
+                }
+            });
         });
-    });
+    }
+
+    updateSegmentSpec();
+    window.addEventListener('resize', updateSegmentSpec);
 }
 
 export function renderCategoryChart(data, onInsightCallback) {
     const monthlyData = aggregateByMonth(data, 'category');
 
-    const categorySpec = {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "data": {"values": monthlyData},
-        "facet": {
-            "row": {
-                "field": "category",
-                "type": "nominal",
-                "title": null,
-                "header": {"labelFontSize": 14}
-            }
-        },
-        "spec": {
-            "width": 380,
-            "height": 100,
-            "mark": {"type": "line", "point": true},
-            "encoding": {
-                "x": {
-                    "field": "date",
-                    "type": "temporal",
-                    "title": "Date",
-                    "axis": {"format": "%b %Y"}
-                },
-                "y": {
-                    "field": "sales",
-                    "type": "quantitative",
-                    "title": "Sales ($)",
-                    "axis": {"format": "$,.0f"}
-                },
-                "color": {
+    function updateCategorySpec() {
+        const dims = getChartDimensions();
+        const categorySpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "data": {"values": monthlyData},
+            "facet": {
+                "row": {
                     "field": "category",
                     "type": "nominal",
-                    "scale": {
-                        "domain": ["Furniture", "Office Supplies", "Technology"],
-                        "range": ["#76b900", "#ff9500", "#0084ff"]
+                    "title": null,
+                    "header": {"labelFontSize": dims.chartFontSize, "labelAngle": 0, "labelAlign": "left"}
+                }
+            },
+            "spec": {
+                "width": dims.chartWidth,
+                "height": dims.chartHeight / 3,  // Divide by 3 for each category
+                "mark": {"type": "line", "point": true},
+                "encoding": {
+                    "x": {
+                        "field": "date",
+                        "type": "temporal",
+                        "title": "Date",
+                        "axis": {"format": "%b %Y"}
                     },
-                    "legend": null
-                },
-                "tooltip": [
-                    {"field": "date", "type": "temporal", "title": "Date"},
-                    {"field": "category", "type": "nominal", "title": "Category"},
-                    {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"},
-                    {"field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f"}
-                ]
+                    "y": {
+                        "field": "sales",
+                        "type": "quantitative",
+                        "title": "Sales ($)",
+                        "axis": {"format": "$,.0f"}
+                    },
+                    "color": {
+                        "field": "category",
+                        "type": "nominal",
+                        "scale": {
+                            "domain": ["Furniture", "Office Supplies", "Technology"],
+                            "range": ["#76b900", "#ff9500", "#0084ff"]
+                        },
+                        "legend": null
+                    },
+                    "tooltip": [
+                        {"field": "date", "type": "temporal", "title": "Date"},
+                        {"field": "category", "type": "nominal", "title": "Category"},
+                        {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"},
+                        {"field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f"}
+                    ]
+                }
             }
-        }
-    };
-
-    vegaEmbed('#category-chart', categorySpec, {actions: false}).then(result => {
-        result.view.addEventListener('click', (event, item) => {
-            if (item && item.datum) {
-                onInsightCallback('category', item.datum);
-            }
+        };
+        vegaEmbed('#category-chart', categorySpec, {actions: false}).then(result => {
+            result.view.addEventListener('click', (event, item) => {
+                if (item && item.datum) {
+                    onInsightCallback('category', item.datum);
+                }
+            });
         });
-    });
+    }
+
+    updateCategorySpec();
+    window.addEventListener('resize', updateCategorySpec);
 } 
