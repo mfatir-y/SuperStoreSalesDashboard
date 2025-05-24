@@ -1,4 +1,20 @@
 export function renderMap(data, onInsightCallback) {
+    const stateToFIPS = {
+      'Alabama': '01', 'Alaska': '02', 'Arizona': '04', 'Arkansas': '05',
+      'California': '06', 'Colorado': '08', 'Connecticut': '09', 'Delaware': '10',
+      'Florida': '12', 'Georgia': '13', 'Hawaii': '15', 'Idaho': '16',
+      'Illinois': '17', 'Indiana': '18', 'Iowa': '19', 'Kansas': '20',
+      'Kentucky': '21', 'Louisiana': '22', 'Maine': '23', 'Maryland': '24',
+      'Massachusetts': '25', 'Michigan': '26', 'Minnesota': '27', 'Mississippi': '28',
+      'Missouri': '29', 'Montana': '30', 'Nebraska': '31', 'Nevada': '32',
+      'New Hampshire': '33', 'New Jersey': '34', 'New Mexico': '35', 'New York': '36',
+      'North Carolina': '37', 'North Dakota': '38', 'Ohio': '39', 'Oklahoma': '40',
+      'Oregon': '41', 'Pennsylvania': '42', 'Rhode Island': '44', 'South Carolina': '45',
+      'South Dakota': '46', 'Tennessee': '47', 'Texas': '48', 'Utah': '49',
+      'Vermont': '50', 'Virginia': '51', 'Washington': '53', 'West Virginia': '54',
+      'Wisconsin': '55', 'Wyoming': '56'
+    };
+
     // Group data by state for map visualization
     const stateData = {};
     data.forEach(d => {
@@ -21,48 +37,73 @@ export function renderMap(data, onInsightCallback) {
         ...d,
         profitRatio: d.sales > 0 ? (d.profit / d.sales) * 100 : 0
     }));
-
+    mapData.forEach(d => {
+      d.id = stateToFIPS[d.state];
+    });
     const mapSpec = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "width": 550,
-        "height": 350,
-        "data": {"values": mapData},
-        "mark": {"type": "bar", "tooltip": true},
-        "encoding": {
-            "x": {
-                "field": "state",
-                "type": "nominal",
-                "title": "State",
-                "axis": {"labelAngle": -45}
-            },
-            "y": {
-                "field": "sales",
-                "type": "quantitative",
-                "title": "Sales ($)"
-            },
-            "color": {
-                "field": "profitRatio",
-                "type": "quantitative",
-                "scale": {
+        "title": "US Profitability Data",
+        "width": 700,
+        "height": 400,
+        "projection": {"type": "albersUsa"},
+        "layer": [
+            {
+              "data": {
+                "url": "data/us-10m.json",
+                "format": {
+                  "type": "topojson",
+                  "feature": "states"
+                }
+              },
+              "transform": [
+                {
+                    "lookup": "id",
+                    "from": {
+                        "data": { "values": mapData },
+                        "key": "id",
+                        "fields": ["state", "sales", "profit", "profitRatio", "region"]
+                    }
+                }
+              ],
+              "mark": {
+                "type": "geoshape",
+                "stroke": "#0ff",
+                "strokeWidth": 0.5
+              },
+              "encoding": {
+                "color": {
+                  "field": "profitRatio",
+                  "type": "quantitative",
+                  "scale": {
                     "domain": [-50, 0, 50],
                     "range": ["#ff6b6b", "#ffffff", "#45b7d1"]
+                  },
+                  "title": "Profit Ratio (%)"
                 },
-                "title": "Profit Ratio (%)"
-            },
-            "tooltip": [
-                {"field": "state", "type": "nominal", "title": "State"},
-                {"field": "region", "type": "nominal", "title": "Region"},
-                {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"},
-                {"field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f"},
-                {"field": "profitRatio", "type": "quantitative", "title": "Profit Ratio", "format": ".1f"}
-            ]
-        }
+                "tooltip": [
+                  { "field": "state", "type": "nominal", "title": "State" },
+                  { "field": "region", "type": "nominal", "title": "Region" },
+                  { "field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f" },
+                  { "field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f" },
+                  { "field": "profitRatio", "type": "quantitative", "title": "Profit Percent", "format": ".1f" }
+                ]
+              }
+            }
+
+        ]
     };
 
     vegaEmbed('#map-chart', mapSpec, {actions: false}).then(result => {
         result.view.addEventListener('click', (event, item) => {
             if (item && item.datum) {
-                onInsightCallback('location', item.datum);
+                const insightData = {
+                    state: item.datum.state,
+                    region: item.datum.region,
+                    sales: item.datum.sales,
+                    profit: item.datum.profit,
+                    profitRatio: item.datum.profitRatio
+                };
+                onInsightCallback('location', insightData);
             }
         });
     });
