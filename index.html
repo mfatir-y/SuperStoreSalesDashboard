@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Superstore Sales Overview Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -22,27 +22,27 @@
         <div class="kpi-container">
             <div class="kpi-card">
                 <div class="kpi-label">Sales</div>
-                <div class="kpi-value" id="kpi-sales">$10,383,051</div>
+                <div class="kpi-value" id="kpi-sales">Loading...</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Profit</div>
-                <div class="kpi-value" id="kpi-profit">$1,218,516</div>
+                <div class="kpi-value" id="kpi-profit">Loading...</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Profit Ratio</div>
-                <div class="kpi-value" id="kpi-profit-ratio">12%</div>
+                <div class="kpi-value" id="kpi-profit-ratio">Loading...</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Profit per Order</div>
-                <div class="kpi-value" id="kpi-profit-order">$59.17</div>
+                <div class="kpi-value" id="kpi-profit-order">Loading...</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Profit per Customer</div>
-                <div class="kpi-value" id="kpi-profit-customer">$1,532.73</div>
+                <div class="kpi-value" id="kpi-profit-customer">Loading...</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Discount</div>
-                <div class="kpi-value" id="kpi-discount">14%</div>
+                <div class="kpi-value" id="kpi-discount">Loading...</div>
             </div>
         </div>
 
@@ -53,10 +53,10 @@
 
             <div class="filters-container">
                 <div class="filter-group">
-                    <label class="filter-label">Order Date</label>
+                    <label for="date-filter" class="filter-label">Order Date</label>
                     <select class="filter-select" id="date-filter">
-                        <option value="all">All</option>
-                        <option value="last-3-years" selected>Last 3 years</option>
+                        <option value="all" selected>All</option>
+                        <option value="last-3-years">Last 3 years</option>
                         <option value="2014">2014</option>
                         <option value="2015">2015</option>
                         <option value="2016">2016</option>
@@ -65,64 +65,53 @@
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Market</label>
-                    <select class="filter-select" id="market-filter">
+                    <label for="region-filter" class="filter-label">Region</label>
+                    <select class="filter-select" id="region-filter">
                         <option value="all" selected>(All)</option>
-                        <option value="Africa">Africa</option>
-                        <option value="US">Canada</option>
-                        <option value="US">US</option>
-                        <option value="EU">EU</option>
-                        <option value="APAC">APAC</option>
-                        <option value="LATAM">EMEA</option>
-                        <option value="LATAM">LATAM</option>
+                        <option value="Central">Central</option>
+                        <option value="East">East</option>
+                        <option value="South">South</option>
+                        <option value="West">West</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
                     <label class="filter-label">Profit Ratio</label>
                     <div class="range-container">
-                        <input type="range" class="range-input" id="profit-ratio-max"
-                               min="-169" max="44" value="44">
-                        <div class="range-values">
-                            <span id="profit-min-val">-169%</span>
-                            <span id="profit-max-val">44%</span>
+                        <div class="range-row">
+                            <label for="profit-ratio-min" class="range-side-label">Min</label>
+                            <input type="range" class="range-input" id="profit-ratio-min" min="-100" max="100" value="-100">
+                            <span id="profit-min-val" class="range-value">-100%</span>
+                        </div>
+                        <div class="range-row">
+                            <label for="profit-ratio-max" class="range-side-label">Max</label>
+                            <input type="range" class="range-input" id="profit-ratio-max" min="-100" max="100" value="100">
+                            <span id="profit-max-val" class="range-value">100%</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="legend">
-                    <div class="legend-title">Sales</div>
+                    <div class="legend-title">Sales Volume</div>
                     <div class="legend-item">
-                        <div class="legend-color"></div>
-                        <span>$20</span>
+                        <div class="legend-color" style="background: #ff6b6b; width: 8px; height: 8px;"></div>
+                        <span>Small ($0-$1K)</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-color"></div>
-                        <span>$500,000</span>
+                        <div class="legend-color" style="background: #4ecdc4; width: 12px; height: 12px;"></div>
+                        <span>Medium ($1K-$10K)</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-color"></div>
-                        <span>$1,000,000</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color"></div>
-                        <span>$1,500,000</span>
+                        <div class="legend-color" style="background: #45b7d1; width: 16px; height: 16px;"></div>
+                        <span>Large ($10K+)</span>
                     </div>
                 </div>
 
                 <div class="legend">
                     <div class="legend-title">Profit Ratio</div>
-                    <div class="legend-item">
-                        <div class="legend-color"></div>
-                        <span>-50% to 50%</span>
-                    </div>
-                    <div>
-                        <div>
-                            <span>Unprofitable</span>
-                        </div>
-                        <div>
-                            <span>Profitable</span>
-                        </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                        <span style="color: #ff6b6b;">Unprofitable</span>
+                        <span style="color: #45b7d1;">Profitable</span>
                     </div>
                 </div>
             </div>
@@ -130,14 +119,14 @@
 
         <div class="charts-container">
             <div class="chart-section">
-                <div class="chart-title">Monthly Sales by Segment - All</div>
+                <div class="chart-title">Monthly Sales by Segment</div>
                 <div class="chart-content">
                     <div id="segment-chart" class="loading">Loading chart...</div>
                 </div>
             </div>
 
             <div class="chart-section">
-                <div class="chart-title">Monthly Sales by Product Category - All</div>
+                <div class="chart-title">Monthly Sales by Product Category</div>
                 <div class="chart-content">
                     <div id="category-chart" class="loading">Loading chart...</div>
                 </div>
@@ -149,6 +138,405 @@
             <div class="insight-text" id="insight-text"></div>
         </div>
     </div>
-    <script src="dashboard.js" type="module"></script>
+
+    <script>
+        class SuperstoreDashboard {
+            constructor() {
+                this.data = [];
+                this.filters = {
+                    dateRange: 'all',
+                    region: 'all',
+                    profitRatioMin: -100,
+                    profitRatioMax: 100
+                };
+                this.selectedContext = null;
+                this.initializeEventListeners();
+                this.loadData();
+            }
+
+            async loadData() {
+                try {
+                    let csvText;
+                    try {
+                        const fileData = await window.fs.readFile('data/sample_superstore.csv', { encoding: 'utf8' });
+                        csvText = fileData;
+                    } catch (e) {
+                        // Fallback to fetch if file reading fails
+                        const response = await fetch('data/sample_superstore.csv');
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        csvText = await response.text();
+                    }
+
+                    // Parse CSV
+                    const lines = csvText.trim().split('\n');
+                    const headers = lines[0].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+                    this.data = lines.slice(1).map(line => {
+                        const values = line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+                        const record = {};
+                        headers.forEach((header, index) => {
+                            record[header.replace(/"/g, '').trim()] = values[index] ? values[index].replace(/"/g, '').trim() : '';
+                        });
+
+                        // Calculate profit ratio (Profit / Sales * 100)
+                        const sales = parseFloat(record['Sales']) || 0;
+                        const profit = parseFloat(record['Profit']) || 0;
+                        let profitRatio = 0;
+                        if (sales !== 0) {
+                            profitRatio = (profit / sales) * 100;
+                        }
+
+
+                        return {
+                            date: new Date(record['Order Date']),
+                            segment: record['Segment'] || '',
+                            category: record['Category'] || '',
+                            region: record['Region'] || '',
+                            state: record['State'] || '',
+                            city: record['City'] || '',
+                            country: record['Country'] || '',
+                            sales: sales,
+                            profit: profit,
+                            profitRatio: profitRatio,
+                            discount: parseFloat(record['Discount']) || 0,
+                            quantity: parseInt(record['Quantity']) || 0
+                        };
+                    }).filter(record => !isNaN(record.date.getTime())); // Filter out invalid dates
+
+                    console.log(`Loaded ${this.data.length} records`);
+                    this.renderDashboard();
+                } catch (error) {
+                    console.error('Error loading CSV data:', error);
+                    document.querySelectorAll('.loading').forEach(el => {
+                        el.textContent = 'Error loading data. Please check console for details.';
+                    });
+                }
+            }
+
+            initializeEventListeners() {
+                const dateFilter = document.getElementById('date-filter');
+                dateFilter.addEventListener('change', (e) => {
+                    this.filters.dateRange = e.target.value;
+                    this.updateDashboard();
+                });
+
+                const regionFilter = document.getElementById('region-filter');
+                regionFilter.addEventListener('change', (e) => {
+                    this.filters.region = e.target.value;
+                    this.updateDashboard();
+                });
+
+                const profitMinInput = document.getElementById('profit-ratio-min');
+                profitMinInput.addEventListener('input', (e) => {
+                    const val = parseInt(e.target.value, 10);
+                    this.filters.profitRatioMin = val;
+                    document.getElementById('profit-min-val').textContent = val + '%';
+                    this.updateDashboard();
+                });
+
+                const profitMaxInput = document.getElementById('profit-ratio-max');
+                profitMaxInput.addEventListener('input', (e) => {
+                    const val = parseInt(e.target.value, 10);
+                    this.filters.profitRatioMax = val;
+                    document.getElementById('profit-max-val').textContent = val + '%';
+                    this.updateDashboard();
+                });
+            }
+
+            filterData(data) {
+                return data.filter(d => {
+                    if (this.filters.dateRange !== 'all') {
+                        const year = d.date.getFullYear();
+                        if (this.filters.dateRange === 'last-3-years') {
+                            const maxYear = this.data.reduce((max, record) => {
+                                const recordYear = record.date.getFullYear();
+                                return recordYear > max ? recordYear : max;
+                            }, 0);
+                            if (year < maxYear - 2) return false; // last 3 years includes current year, so maxYear - 2
+                        } else if (this.filters.dateRange !== year.toString()) {
+                            return false;
+                        }
+                    }
+                    if (this.filters.region !== 'all' && d.region !== this.filters.region) {
+                        return false;
+                    }
+                    if (d.profitRatio < this.filters.profitRatioMin || d.profitRatio > this.filters.profitRatioMax) {
+                        return false;
+                    }
+                    // Keep data record if it's in filters
+                    return true;
+                });
+            }
+
+            updateKPIs(filteredData) {
+                if (filteredData.length === 0) return;
+                const totalSales = filteredData.reduce((sum, d) => sum + d.sales, 0);
+                const totalProfit = filteredData.reduce((sum, d) => sum + d.profit, 0);
+                const avgDiscount = filteredData.reduce((sum, d) => sum + d.discount, 0) / filteredData.length;
+                const profitRatio = totalSales > 0 ? (totalProfit / totalSales) * 100 : 0;
+                const uniqueOrders = new Set(filteredData.map(d => d.date.toDateString())).size;
+                const uniqueCustomers = Math.max(1, Math.floor(filteredData.length / 3)); // Approximate
+
+                document.getElementById('kpi-sales').textContent = '$' + totalSales.toLocaleString(undefined, {maximumFractionDigits: 0});
+                document.getElementById('kpi-profit').textContent = '$' + totalProfit.toLocaleString(undefined, {maximumFractionDigits: 0});
+                document.getElementById('kpi-profit-ratio').textContent = profitRatio.toFixed(1) + '%';
+                document.getElementById('kpi-profit-order').textContent = '$' + (totalProfit / Math.max(1, uniqueOrders)).toFixed(2);
+                document.getElementById('kpi-profit-customer').textContent = '$' + (totalProfit / uniqueCustomers).toFixed(2);
+                document.getElementById('kpi-discount').textContent = (avgDiscount * 100).toFixed(1) + '%';
+            }
+
+            renderMap(data) {
+                // Group data by state for map visualization
+                const stateData = {};
+                data.forEach(d => {
+                    if (!stateData[d.state]) {
+                        stateData[d.state] = {
+                            state: d.state,
+                            region: d.region,
+                            sales: 0,
+                            profit: 0,
+                            count: 0
+                        };
+                    }
+                    stateData[d.state].sales += d.sales;
+                    stateData[d.state].profit += d.profit;
+                    stateData[d.state].count += 1;
+                });
+
+                // Convert to array and calculate profit ratios
+                const mapData = Object.values(stateData).map(d => ({
+                    ...d,
+                    profitRatio: d.sales > 0 ? (d.profit / d.sales) * 100 : 0
+                }));
+
+                // Simple visualization since we don't have lat/lng
+                const chartContainer = document.getElementById('map-chart');
+                chartContainer.innerHTML = '';
+
+                // Create a simple bar chart as map substitute
+                const mapSpec = {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "width": 550,
+                    "height": 350,
+                    "data": {"values": mapData},
+                    "mark": {"type": "bar", "tooltip": true},
+                    "encoding": {
+                        "x": {
+                            "field": "state",
+                            "type": "nominal",
+                            "title": "State",
+                            "axis": {"labelAngle": -45}
+                        },
+                        "y": {
+                            "field": "sales",
+                            "type": "quantitative",
+                            "title": "Sales ($)"
+                        },
+                        "color": {
+                            "field": "profitRatio",
+                            "type": "quantitative",
+                            "scale": {
+                                "domain": [-50, 0, 50],
+                                "range": ["#ff6b6b", "#ffffff", "#45b7d1"]
+                            },
+                            "title": "Profit Ratio (%)"
+                        },
+                        "tooltip": [
+                            {"field": "state", "type": "nominal", "title": "State"},
+                            {"field": "region", "type": "nominal", "title": "Region"},
+                            {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"},
+                            {"field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f"},
+                            {"field": "profitRatio", "type": "quantitative", "title": "Profit Ratio", "format": ".1f"}
+                        ]
+                    }
+                };
+
+                vegaEmbed('#map-chart', mapSpec, {actions: false}).then(result => {
+                    result.view.addEventListener('click', (event, item) => {
+                        if (item && item.datum) {
+                            this.selectedContext = {
+                                type: 'location',
+                                data: item.datum
+                            };
+                            this.showInsight();
+                        }
+                    });
+                });
+            }
+
+            renderSegmentChart(data) {
+                const monthlyData = this.aggregateByMonth(data, 'segment');
+
+                const segmentSpec = {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "width": 380,
+                    "height": 200,
+                    "data": {"values": monthlyData},
+                    "mark": {"type": "area", "opacity": 0.8},
+                    "encoding": {
+                        "x": {
+                            "field": "date",
+                            "type": "temporal",
+                            "title": "Date",
+                            "axis": {"format": "%b %Y"}
+                        },
+                        "y": {
+                            "field": "sales",
+                            "type": "quantitative",
+                            "title": "Sales ($)",
+                            "axis": {"format": "$,.0f"}
+                        },
+                        "color": {
+                            "field": "segment",
+                            "type": "nominal",
+                            "scale": {
+                                "domain": ["Consumer", "Corporate", "Home Office"],
+                                "range": ["#4e79a7", "#f28e2c", "#e15759"]
+                            },
+                            "legend": {"title": "Segment"}
+                        },
+                        "tooltip": [
+                            {"field": "date", "type": "temporal", "title": "Date"},
+                            {"field": "segment", "type": "nominal", "title": "Segment"},
+                            {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"}
+                        ]
+                    }
+                };
+
+                vegaEmbed('#segment-chart', segmentSpec, {actions: false}).then(result => {
+                    result.view.addEventListener('click', (event, item) => {
+                        if (item && item.datum) {
+                            this.selectedContext = {
+                                type: 'segment',
+                                data: item.datum
+                            };
+                            this.showInsight();
+                        }
+                    });
+                });
+            }
+
+            renderCategoryChart(data) {
+                const monthlyData = this.aggregateByMonth(data, 'category');
+
+                const categorySpec = {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "width": 380,
+                    "height": 200,
+                    "data": {"values": monthlyData},
+                    "mark": {"type": "area", "opacity": 0.8},
+                    "encoding": {
+                        "x": {
+                            "field": "date",
+                            "type": "temporal",
+                            "title": "Date",
+                            "axis": {"format": "%b %Y"}
+                        },
+                        "y": {
+                            "field": "sales",
+                            "type": "quantitative",
+                            "title": "Sales ($)",
+                            "axis": {"format": "$,.0f"}
+                        },
+                        "color": {
+                            "field": "category",
+                            "type": "nominal",
+                            "scale": {
+                                "domain": ["Furniture", "Office Supplies", "Technology"],
+                                "range": ["#76b900", "#ff9500", "#0084ff"]
+                            },
+                            "legend": {"title": "Category"}
+                        },
+                        "tooltip": [
+                            {"field": "date", "type": "temporal", "title": "Date"},
+                            {"field": "category", "type": "nominal", "title": "Category"},
+                            {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"}
+                        ]
+                    }
+                };
+
+                vegaEmbed('#category-chart', categorySpec, {actions: false}).then(result => {
+                    result.view.addEventListener('click', (event, item) => {
+                        if (item && item.datum) {
+                            this.selectedContext = {
+                                type: 'category',
+                                data: item.datum
+                            };
+                            this.showInsight();
+                        }
+                    });
+                });
+            }
+
+            aggregateByMonth(data, groupBy) {
+                const grouped = {};
+
+                data.forEach(d => {
+                    const monthKey = d.date.getFullYear() + '-' + String(d.date.getMonth() + 1).padStart(2, '0');
+                    const key = `${monthKey}_${d[groupBy]}`;
+
+                    if (!grouped[key]) {
+                        grouped[key] = {
+                            date: monthKey + '-01',
+                            [groupBy]: d[groupBy],
+                            sales: 0,
+                            profit: 0,
+                            count: 0,
+                        };
+                    }
+                    grouped[key].sales += d.sales;
+                    grouped[key].profit += d.profit;
+                    grouped[key].count += 1;
+                });
+
+                return Object.values(grouped).map(o => ({
+                    ...o,
+                    date: new Date(o.date),
+                }));
+            }
+
+            showInsight() {
+                if (!this.selectedContext) return;
+
+                const { type, data } = this.selectedContext;
+                let insightText = '';
+
+                if (type === 'location') {
+                    const profitStatus = data.profitRatio > 0 ? 'profitable' : 'unprofitable';
+                    insightText = `Location Analysis: ${data.state} shows ${Math.abs(data.profitRatio).toFixed(1)}% profit ratio with $${data.sales.toLocaleString()} in sales. This location is currently ${profitStatus}, ${data.profitRatio > 10 ? 'performing exceptionally well' : data.profitRatio < -10 ? 'requiring immediate attention' : 'showing moderate performance'}.`;
+                } else if (type === 'segment') {
+                    const monthName = data.date.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+                    insightText = `Segment Trends: ${data.segment} segment generated $${data.sales.toLocaleString()} in ${monthName}. ${data.segment === 'Consumer' ? 'Consumer segment typically shows steady growth with seasonal peaks.' : data.segment === 'Corporate' ? 'Corporate segment demonstrates consistent bulk purchasing patterns.' : 'Home Office segment reflects remote work trends and smaller order volumes.'}`;
+                } else if (type === 'category') {
+                    const monthName = data.date.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+                    insightText = `Category Performance: ${data.category} category achieved $${data.sales.toLocaleString()} in sales during ${monthName}. ${data.category === 'Technology' ? 'Technology products typically have higher margins but seasonal demand patterns.' : data.category === 'Furniture' ? 'Furniture sales show longer purchase cycles with higher transaction values.' : 'Office Supplies demonstrate consistent demand with frequent reorders.'}`;
+                }
+
+                document.getElementById('insight-text').textContent = insightText;
+                document.getElementById('insight-panel').style.display = 'block';
+            }
+
+            renderDashboard() {
+                const filteredData = this.filterData(this.data);
+                this.updateKPIs(filteredData);
+                this.renderMap(filteredData);
+                this.renderSegmentChart(filteredData);
+                this.renderCategoryChart(filteredData);
+            }
+
+            updateDashboard() {
+                this.renderDashboard();
+                // Hide insight panel when filters change
+                document.getElementById('insight-panel').style.display = 'none';
+                this.selectedContext = null;
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new SuperstoreDashboard();
+        });
+    </script>
 </body>
 </html>
