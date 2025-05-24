@@ -1,5 +1,3 @@
-import { aggregateByMonth } from './dataLoader.js';
-
 export function renderMap(data, onInsightCallback) {
     // Group data by state for map visualization
     const stateData = {};
@@ -68,6 +66,29 @@ export function renderMap(data, onInsightCallback) {
             }
         });
     });
+}
+
+function aggregateByMonth(data, groupBy) {
+    const grouped = {};
+
+    data.forEach(d => {
+        const monthKey = d.date.getFullYear() + '-' + String(d.date.getMonth() + 1).padStart(2, '0');
+        const key = `${monthKey}_${d[groupBy]}`;
+
+        if (!grouped[key]) {
+            grouped[key] = {
+                date: monthKey + '-01',
+                [groupBy]: d[groupBy],
+                sales: 0,
+                profit: 0,
+                count: 0,
+            };
+        }
+        grouped[key].sales += d.sales;
+        grouped[key].profit += d.profit;
+        grouped[key].count += 1;
+    });
+    return Object.values(grouped).map(o => ({...o, date: new Date(o.date)}));
 }
 
 export function renderSegmentChart(data, onInsightCallback) {

@@ -26,7 +26,7 @@ export async function loadSuperstoreData() {
 function parseCSVData(csvText) {
     const lines = csvText.trim().split('\n');
     const headers = lines[0].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-    
+
     return lines.slice(1).map(line => {
         const values = line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
         const record = {};
@@ -58,30 +58,3 @@ function parseCSVData(csvText) {
         };
     }).filter(record => !isNaN(record.date.getTime())); // Filter out invalid dates
 }
-
-export function aggregateByMonth(data, groupBy) {
-    const grouped = {};
-
-    data.forEach(d => {
-        const monthKey = d.date.getFullYear() + '-' + String(d.date.getMonth() + 1).padStart(2, '0');
-        const key = `${monthKey}_${d[groupBy]}`;
-
-        if (!grouped[key]) {
-            grouped[key] = {
-                date: monthKey + '-01',
-                [groupBy]: d[groupBy],
-                sales: 0,
-                profit: 0,
-                count: 0,
-            };
-        }
-        grouped[key].sales += d.sales;
-        grouped[key].profit += d.profit;
-        grouped[key].count += 1;
-    });
-
-    return Object.values(grouped).map(o => ({
-        ...o,
-        date: new Date(o.date),
-    }));
-} 
