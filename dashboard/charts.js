@@ -40,6 +40,7 @@ export function renderMap(data, onInsightCallback) {
     mapData.forEach(d => {
       d.id = stateToFIPS[d.state];
     });
+    console.log("mapData", mapData);
     const mapSpec = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": "US Profitability Data",
@@ -97,12 +98,13 @@ export function renderMap(data, onInsightCallback) {
         result.view.addEventListener('click', (event, item) => {
             if (item && item.datum) {
                 const insightData = {
-                    state: item.datum.state,
+                    state: item.datum.properties.name,
                     region: item.datum.region,
                     sales: item.datum.sales,
                     profit: item.datum.profit,
                     profitRatio: item.datum.profitRatio
                 };
+                console.log(insightData);
                 onInsightCallback('location', insightData);
             }
         });
@@ -137,37 +139,48 @@ export function renderSegmentChart(data, onInsightCallback) {
 
     const segmentSpec = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "width": 380,
-        "height": 200,
         "data": {"values": monthlyData},
-        "mark": {"type": "area", "opacity": 0.8},
-        "encoding": {
-            "x": {
-                "field": "date",
-                "type": "temporal",
-                "title": "Date",
-                "axis": {"format": "%b %Y"}
-            },
-            "y": {
-                "field": "sales",
-                "type": "quantitative",
-                "title": "Sales ($)",
-                "axis": {"format": "$,.0f"}
-            },
-            "color": {
+        "facet": {
+            "row": {
                 "field": "segment",
                 "type": "nominal",
-                "scale": {
-                    "domain": ["Consumer", "Corporate", "Home Office"],
-                    "range": ["#4e79a7", "#f28e2c", "#e15759"]
+                "title": null,
+                "header": {"labelFontSize": 14}
+            }
+        },
+        "spec": {
+            "width": 380,
+            "height": 100,
+            "mark": {"type": "line", "point": true},
+            "encoding": {
+                "x": {
+                    "field": "date",
+                    "type": "temporal",
+                    "title": "Date",
+                    "axis": {"format": "%b %Y"}
                 },
-                "legend": {"title": "Segment"}
-            },
-            "tooltip": [
-                {"field": "date", "type": "temporal", "title": "Date"},
-                {"field": "segment", "type": "nominal", "title": "Segment"},
-                {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"}
-            ]
+                "y": {
+                    "field": "sales",
+                    "type": "quantitative",
+                    "title": "Sales ($)",
+                    "axis": {"format": "$,.0f"}
+                },
+                "color": {
+                    "field": "segment",
+                    "type": "nominal",
+                    "scale": {
+                        "domain": ["Consumer", "Corporate", "Home Office"],
+                        "range": ["#4e79a7", "#f28e2c", "#e15759"]
+                    },
+                    "legend": null
+                },
+                "tooltip": [
+                    {"field": "date", "type": "temporal", "title": "Date"},
+                    {"field": "segment", "type": "nominal", "title": "Segment"},
+                    {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"},
+                    {"field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f"}
+                ]
+            }
         }
     };
 
@@ -185,37 +198,48 @@ export function renderCategoryChart(data, onInsightCallback) {
 
     const categorySpec = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "width": 380,
-        "height": 200,
         "data": {"values": monthlyData},
-        "mark": {"type": "area", "opacity": 0.8},
-        "encoding": {
-            "x": {
-                "field": "date",
-                "type": "temporal",
-                "title": "Date",
-                "axis": {"format": "%b %Y"}
-            },
-            "y": {
-                "field": "sales",
-                "type": "quantitative",
-                "title": "Sales ($)",
-                "axis": {"format": "$,.0f"}
-            },
-            "color": {
+        "facet": {
+            "row": {
                 "field": "category",
                 "type": "nominal",
-                "scale": {
-                    "domain": ["Furniture", "Office Supplies", "Technology"],
-                    "range": ["#76b900", "#ff9500", "#0084ff"]
+                "title": null,
+                "header": {"labelFontSize": 14}
+            }
+        },
+        "spec": {
+            "width": 380,
+            "height": 100,
+            "mark": {"type": "line", "point": true},
+            "encoding": {
+                "x": {
+                    "field": "date",
+                    "type": "temporal",
+                    "title": "Date",
+                    "axis": {"format": "%b %Y"}
                 },
-                "legend": {"title": "Category"}
-            },
-            "tooltip": [
-                {"field": "date", "type": "temporal", "title": "Date"},
-                {"field": "category", "type": "nominal", "title": "Category"},
-                {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"}
-            ]
+                "y": {
+                    "field": "sales",
+                    "type": "quantitative",
+                    "title": "Sales ($)",
+                    "axis": {"format": "$,.0f"}
+                },
+                "color": {
+                    "field": "category",
+                    "type": "nominal",
+                    "scale": {
+                        "domain": ["Furniture", "Office Supplies", "Technology"],
+                        "range": ["#76b900", "#ff9500", "#0084ff"]
+                    },
+                    "legend": null
+                },
+                "tooltip": [
+                    {"field": "date", "type": "temporal", "title": "Date"},
+                    {"field": "category", "type": "nominal", "title": "Category"},
+                    {"field": "sales", "type": "quantitative", "title": "Sales", "format": "$,.0f"},
+                    {"field": "profit", "type": "quantitative", "title": "Profit", "format": "$,.0f"}
+                ]
+            }
         }
     };
 
