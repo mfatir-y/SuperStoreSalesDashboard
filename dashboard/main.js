@@ -53,9 +53,13 @@ class SuperstoreDashboard {
         });
     }
 
-    handleInsight = (type, data) => {
+    handleInsight = async (type, data) => {
         this.selectedContext = { type, data };
-        showInsight(type, data);
+        const context = {
+            filters: this.filters,
+            kpis: calculateKPIs(filterData(this.data, this.filters))
+        };
+        await showInsight(type, data, context);
     }
 
     renderDashboard() {

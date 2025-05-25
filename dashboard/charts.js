@@ -109,7 +109,7 @@ export function renderMap(data, onInsightCallback) {
             result.view.addEventListener('click', (event, item) => {
                 if (item && item.datum) {
                     const insightData = {
-                        state: item.datum.properties.name,
+                        state: item.datum.state,
                         region: item.datum.region,
                         sales: item.datum.sales,
                         profit: item.datum.profit,
