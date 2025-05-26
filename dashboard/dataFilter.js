@@ -15,10 +15,7 @@ export function filterData(data, filters) {
         if (filters.region !== 'all' && d.region !== filters.region) {
             return false;
         }
-        if (d.profitRatio < filters.profitRatioMin || d.profitRatio > filters.profitRatioMax) {
-            return false;
-        }
-        return true;
+        return !(d.profitRatio < filters.profitRatioMin || d.profitRatio > filters.profitRatioMax);
     });
 }
 
@@ -30,7 +27,7 @@ export function calculateKPIs(filteredData) {
     const avgDiscount = filteredData.reduce((sum, d) => sum + d.discount, 0) / filteredData.length;
     const profitRatio = totalSales > 0 ? (totalProfit / totalSales) * 100 : 0;
     const uniqueOrders = new Set(filteredData.map(d => d.date.toDateString())).size;
-    const uniqueCustomers = Math.max(1, Math.floor(filteredData.length / 3)); // Approximate
+    const uniqueCustomers = Math.max(1, Math.floor(filteredData.length / 3));
 
     return {
         totalSales,

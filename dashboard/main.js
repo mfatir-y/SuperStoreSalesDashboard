@@ -54,7 +54,6 @@ class SuperstoreDashboard {
         this.selectedContext = { type, data };
         const context = {
             filters: this.filters,
-            kpis: calculateKPIs(filterData(this.data, this.filters))
         };
         await showInsight(type, data, context);
     }
