@@ -1,18 +1,10 @@
 export async function loadSuperstoreData() {
     try {
-        let csvText;
-        try {
-            const fileData = await window.fs.readFile('data/sample_superstore.csv', { encoding: 'utf8' });
-            csvText = fileData;
-        } catch (e) {
-            // Fallback to fetch if file reading fails
-            const response = await fetch('data/sample_superstore.csv');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            csvText = await response.text();
+        const response = await fetch('data/sample_superstore.csv');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+        const csvText = await response.text();
         return parseCSVData(csvText);
     } catch (error) {
         console.error('Error loading CSV data:', error);
@@ -25,7 +17,7 @@ export async function loadSuperstoreData() {
 
 function parseCSVData(csvText) {
     const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+    const headers = lines[0].split(",");
 
     return lines.slice(1).map(line => {
         const values = line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
@@ -56,5 +48,5 @@ function parseCSVData(csvText) {
             discount: parseFloat(record['Discount']) || 0,
             quantity: parseInt(record['Quantity']) || 0
         };
-    }).filter(record => !isNaN(record.date.getTime())); // Filter out invalid dates
+    })
 }

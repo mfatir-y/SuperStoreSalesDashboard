@@ -3,7 +3,7 @@ function getChartDimensions() {
     return {
         mapWidth: Math.min(width * 0.5, 700),
         mapHeight: Math.min(width * 0.3, 400),
-        chartWidth: Math.min(width * 0.4, 380),
+        chartWidth: Math.min(width * 0.35, 380),
         chartHeight: Math.min(width * 0.5, 300),
         chartFontSize: Math.min(width * 0.025, 12),
     };
@@ -81,7 +81,7 @@ export function renderMap(data, onInsightCallback) {
                   ],
                   "mark": {
                     "type": "geoshape",
-                    "stroke": "#0ff",
+                    "stroke": "#000",
                     "strokeWidth": 0.5
                   },
                   "encoding": {
@@ -166,30 +166,47 @@ export function renderSegmentChart(data, onInsightCallback) {
             },
             "spec": {
                 "width": dims.chartWidth,
-                "height": dims.chartHeight / 3,  // Divide by 3 for each segment
-                "mark": {"type": "line", "point": true},
+                "height": dims.chartHeight / 3,
+                "layer": [
+                    {
+                        "mark": {"type": "area", "point": false},
+                        "encoding": {
+                            "x": {
+                                "field": "date",
+                                "type": "temporal",
+                                "title": "Date",
+                                "axis": {"format": "%b %Y"}
+                            },
+                            "y": {
+                                "field": "sales",
+                                "type": "quantitative",
+                                "title": "Amount ($)",
+                                "axis": {"format": "$,.0f"}
+                            },
+                            "color": {
+                                "datum": "Sales",
+                                "scale": {
+                                    "domain": ["Sales", "Profit"],
+                                    "range": ["#0faeca", "#ffca24"]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "mark": {"type": "area", "point": false, "strokeDash": [4, 4]},
+                        "encoding": {
+                            "x": {"field": "date", "type": "temporal"},
+                            "y": {
+                                "field": "profit",
+                                "type": "quantitative"
+                            },
+                            "color": {
+                                "datum": "Profit"
+                            }
+                        }
+                    }
+                ],
                 "encoding": {
-                    "x": {
-                        "field": "date",
-                        "type": "temporal",
-                        "title": "Date",
-                        "axis": {"format": "%b %Y"}
-                    },
-                    "y": {
-                        "field": "sales",
-                        "type": "quantitative",
-                        "title": "Sales ($)",
-                        "axis": {"format": "$,.0f"}
-                    },
-                    "color": {
-                        "field": "segment",
-                        "type": "nominal",
-                        "scale": {
-                            "domain": ["Consumer", "Corporate", "Home Office"],
-                            "range": ["#4e79a7", "#f28e2c", "#e15759"]
-                        },
-                        "legend": null
-                    },
                     "tooltip": [
                         {"field": "date", "type": "temporal", "title": "Date"},
                         {"field": "segment", "type": "nominal", "title": "Segment"},
@@ -230,30 +247,47 @@ export function renderCategoryChart(data, onInsightCallback) {
             },
             "spec": {
                 "width": dims.chartWidth,
-                "height": dims.chartHeight / 3,  // Divide by 3 for each category
-                "mark": {"type": "line", "point": true},
+                "height": dims.chartHeight / 3,
+                "layer": [
+                    {
+                        "mark": {"type": "area", "point": false},
+                        "encoding": {
+                            "x": {
+                                "field": "date",
+                                "type": "temporal",
+                                "title": "Date",
+                                "axis": {"format": "%b %Y"}
+                            },
+                            "y": {
+                                "field": "sales",
+                                "type": "quantitative",
+                                "title": "Amount ($)",
+                                "axis": {"format": "$,.0f"}
+                            },
+                            "color": {
+                                "datum": "Sales",
+                                "scale": {
+                                    "domain": ["Sales", "Profit"],
+                                    "range": ["#0faeca", "#ffca24"]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "mark": {"type": "area", "point": false, "strokeDash": [4, 4]},
+                        "encoding": {
+                            "x": {"field": "date", "type": "temporal"},
+                            "y": {
+                                "field": "profit",
+                                "type": "quantitative"
+                            },
+                            "color": {
+                                "datum": "Profit"
+                            }
+                        }
+                    }
+                ],
                 "encoding": {
-                    "x": {
-                        "field": "date",
-                        "type": "temporal",
-                        "title": "Date",
-                        "axis": {"format": "%b %Y"}
-                    },
-                    "y": {
-                        "field": "sales",
-                        "type": "quantitative",
-                        "title": "Sales ($)",
-                        "axis": {"format": "$,.0f"}
-                    },
-                    "color": {
-                        "field": "category",
-                        "type": "nominal",
-                        "scale": {
-                            "domain": ["Furniture", "Office Supplies", "Technology"],
-                            "range": ["#76b900", "#ff9500", "#0084ff"]
-                        },
-                        "legend": null
-                    },
                     "tooltip": [
                         {"field": "date", "type": "temporal", "title": "Date"},
                         {"field": "category", "type": "nominal", "title": "Category"},

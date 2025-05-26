@@ -113,8 +113,7 @@ export async function showInsight(type, data, context) {
     insightPanel.style.display = 'block';
     
     try {
-        const insight = await generateInsight(type, data, context);
-        insightText.textContent = insight;
+        insightText.textContent = await generateInsight(type, data, context);
     } catch (error) {
         console.error('Error generating insight:', error);
         insightText.textContent = 'There was an error generating the insight. Please try again.';

@@ -13,7 +13,7 @@ class SuperstoreDashboard {
             profitRatioMax: 100
         };
         this.selectedContext = null;
-        this.initializeEventListeners();
+        this.handleFilters();
         this.loadData();
     }
 
@@ -23,19 +23,17 @@ class SuperstoreDashboard {
         this.renderDashboard();
     }
 
-    initializeEventListeners() {
+    handleFilters() {
         const dateFilter = document.getElementById('date-filter');
         dateFilter.addEventListener('change', (e) => {
             this.filters.dateRange = e.target.value;
             this.updateDashboard();
         });
-
         const regionFilter = document.getElementById('region-filter');
         regionFilter.addEventListener('change', (e) => {
             this.filters.region = e.target.value;
             this.updateDashboard();
         });
-
         const profitMinInput = document.getElementById('profit-ratio-min');
         profitMinInput.addEventListener('input', (e) => {
             const val = parseInt(e.target.value, 10);
@@ -43,7 +41,6 @@ class SuperstoreDashboard {
             document.getElementById('profit-min-val').textContent = val + '%';
             this.updateDashboard();
         });
-
         const profitMaxInput = document.getElementById('profit-ratio-max');
         profitMaxInput.addEventListener('input', (e) => {
             const val = parseInt(e.target.value, 10);
